@@ -81,9 +81,20 @@ class WhisperXASR(ASRModel):
         if options.get("diarize", False) and CONFIG.HF_TOKEN != "":
             min_speakers = options.get("min_speakers", None)
             max_speakers = options.get("max_speakers", None)
-            # add min/max number of speakers if known
-            diarize_segments = self.model['diarize_model'](audio, min_speakers, max_speakers)
-            result = whisperx.assign_word_speakers(diarize_segments, result)
+            return_embeddings = options.get("return_embeddings", False)
+
+            if return_embeddings:
+                diarize_segments, speaker_embeddings = self.model['diarize_model'](
+                    audio, min_speakers, max_speakers, return_embeddings=True
+                )
+                result = whisperx.assign_word_speakers(diarize_segments, result)
+                result["speaker_embeddings"] = {
+                    speaker: embedding if isinstance(embedding, list) else embedding.tolist()
+                    for speaker, embedding in speaker_embeddings.items()
+                }
+            else:
+                diarize_segments = self.model['diarize_model'](audio, min_speakers, max_speakers)
+                result = whisperx.assign_word_speakers(diarize_segments, result)
         result["language"] = language
 
         output_file = StringIO()
