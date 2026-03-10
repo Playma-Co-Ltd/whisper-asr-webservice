@@ -2,11 +2,11 @@ version: "3.4"
 
 services:
   whisper-asr-webservice:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: onerahmet/openai-whisper-asr-webservice:latest
     environment:
+      - ASR_ENGINE=whisperx
       - ASR_MODEL=base
+      - HF_TOKEN=${HF_TOKEN:-}
     ports:
       - "9000:9000"
     volumes:

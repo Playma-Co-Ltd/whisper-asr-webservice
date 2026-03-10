@@ -86,6 +86,11 @@ async def asr(
         description="Max speakers in this file",
         include_in_schema=(True if CONFIG.ASR_ENGINE == "whisperx" else False),
     ),
+    return_embeddings: bool = Query(
+        default=False,
+        description="Return speaker embeddings for cross-chunk speaker matching",
+        include_in_schema=(True if CONFIG.ASR_ENGINE == "whisperx" and CONFIG.HF_TOKEN != "" else False),
+    ),
     output: Union[str, None] = Query(default="txt", enum=["txt", "vtt", "srt", "tsv", "json"]),
 ):
     result = asr_model.transcribe(
@@ -95,7 +100,7 @@ async def asr(
         initial_prompt,
         vad_filter,
         word_timestamps,
-        {"diarize": diarize, "min_speakers": min_speakers, "max_speakers": max_speakers},
+        {"diarize": diarize, "min_speakers": min_speakers, "max_speakers": max_speakers, "return_embeddings": return_embeddings},
         output,
     )
     return StreamingResponse(
