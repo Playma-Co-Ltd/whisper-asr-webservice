@@ -34,12 +34,12 @@ image = (
         "ASR_MODEL": "large-v2",
         "ASR_ENGINE": "whisperx",
         "ASR_DEVICE": "cpu",
-        "HF_TOKEN": "PLACEHOLDER",
     })
     .run_commands(
         "python -c \"import whisper; whisper.load_model('large-v2', download_root='/root/.cache/whisper')\"",
         "python -c \"import whisperx; whisperx.load_align_model(language_code='zh', device='cpu')\"",
         "python -c \"from whisperx.diarize import DiarizationPipeline; import os; DiarizationPipeline(token=os.environ['HF_TOKEN'], device='cpu')\"",
+        secrets=[modal.Secret.from_name("huggingface-token")],
     )
     .env({
         "ASR_MODEL": "large-v2",
